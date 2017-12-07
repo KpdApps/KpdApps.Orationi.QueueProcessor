@@ -34,22 +34,25 @@ namespace KpdApps.Orationi.QueueProcessor.ConsoleDemo
 
                     if (count > 0)
                     {
-                        for (int i = workers.Count; i <= 20; i++)
+                        for (int i = workers.Count; i <= 100; i++)
                         {
                             Func<string, bool> add = (hostname) =>
                             {
-                                DemoWorker.DemoWorker demoWorker = new DemoWorker.DemoWorker();
-                                demoWorker.QueueName = "task_queue";
-                                demoWorker.Connect(hostname);
-                                demoWorker.BasicConsume();
-                                workers.Add(demoWorker);
+                                
                                 return true;
                             };
                             add("localhost");
                         }
                     }
 
-                    workers.RemoveAll(w => w.IsFinished);
+                    List<DemoWorker.DemoWorker> finishedWorkers = workers.Where(w => w.IsFinished && w.LastActivity.AddSeconds(5) < DateTime.Now).ToList();
+                    foreach (var finishedWorker in finishedWorkers)
+                    {
+                        if (workers.Remove(finishedWorker))
+                        {
+                            worker.Dispose();
+                        }
+                    }
 
                     Console.Clear();
                     Console.WriteLine("Avaliable workers: {0}\r\nIn Queue: {1}", workers.Count, count);

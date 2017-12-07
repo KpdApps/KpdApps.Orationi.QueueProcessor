@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\WorkerBase.cs" />
+    <Compile Include="Classes\WorkerPool.cs" />
     <Compile Include="Interfaces\IWorker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

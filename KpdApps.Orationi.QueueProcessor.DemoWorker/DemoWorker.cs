@@ -15,6 +15,9 @@ namespace KpdApps.Orationi.QueueProcessor.DemoWorker
 
         protected override void Consumer_Received(object sender, BasicDeliverEventArgs e)
         {
+            IsFinished = false;
+            LastActivity = DateTime.Now;
+            
             var body = e.Body;
             var message = Encoding.UTF8.GetString(body);
             Console.WriteLine(" [x] Received {0}", message);
@@ -24,7 +27,11 @@ namespace KpdApps.Orationi.QueueProcessor.DemoWorker
 
             Console.WriteLine(" [x] Done");
 
+            _channel.BasicAck(e.DeliveryTag, false);
+
             IsFinished = true;
+            LastActivity = DateTime.Now;
+            BasicConsume();
         }
 
         public override void BasicConsume()

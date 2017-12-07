@@ -8,7 +8,57 @@ namespace KpdApps.Orationi.QueueProcessor.SDK
 {
     public abstract class WorkerBase : IWorker, IDisposable
     {
-        public bool IsFinished { get; set; }
+        object _locker = new object();
+
+        bool _isFinished;
+        public bool IsFinished
+        {
+            get
+            {
+                lock (_locker)
+                {
+                    return _isFinished;
+                }
+            }
+            set
+            {
+                lock (_locker)
+                {
+                    if (_isFinished == value)
+                    {
+                        return;
+                    }
+
+                    _isFinished = value;
+                }
+            }
+        }
+
+
+        DateTime _lastActivity;
+        public DateTime LastActivity
+        {
+            get
+            {
+                lock (_locker)
+                {
+                    return _lastActivity;
+                }
+            }
+
+            set
+            {
+                lock (_locker)
+                {
+                    if (_lastActivity == value)
+                    {
+                        return;
+                    }
+
+                    _lastActivity = value;
+                }
+            }
+        }
 
         string _queueName = string.Empty;
         public string QueueName
@@ -82,7 +132,7 @@ namespace KpdApps.Orationi.QueueProcessor.SDK
             }
         }
 
-        bool _autoAck = true;
+        bool _autoAck = false;
         public bool AutoAck
         {
             get => _autoAck;
@@ -111,7 +161,7 @@ namespace KpdApps.Orationi.QueueProcessor.SDK
         }
 
         private IConnection _connection;
-        private IModel _channel;
+        protected IModel _channel;
         private EventingBasicConsumer _consumer;
 
         public WorkerBase()

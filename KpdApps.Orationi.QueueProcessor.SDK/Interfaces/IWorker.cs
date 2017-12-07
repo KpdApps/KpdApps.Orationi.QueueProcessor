@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace KpdApps.Orationi.QueueProcessor.SDK.Interfaces
 {
-    interface IWorker
+    public interface IWorker
     {
         void Connect(string hostname);
 
